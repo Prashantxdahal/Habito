@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "182533914136",
+    "project_id": "habito-beb16",
+    "storage_bucket": "habito-beb16.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:182533914136:android:9df5279b271c8b467c4d6d",
+        "android_client_info": {
+          "package_name": "com.example.habito"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3aguf0YrY3Bk_UVRnS1KxqQMBHPbcSUk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
