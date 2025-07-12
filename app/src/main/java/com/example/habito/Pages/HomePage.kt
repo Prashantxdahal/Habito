@@ -14,11 +14,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.habito.ui.theme.AppColors
+import androidx.navigation.NavController
+
 
 data class Habit(val title: String, val description: String, val isCompleted: Boolean = false)
 
 @Composable
-fun HomeScreen() {
+@Composable
+fun HomeScreen(navController: NavController) {
     val habits = remember { mutableStateListOf(
         Habit("Drink Water", "Stay hydrated and fresh"),
         Habit("Read 10 pages", "Daily reading habit"),
