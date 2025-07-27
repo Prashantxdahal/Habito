@@ -13,28 +13,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.habito.ui.theme.AppColors
 import androidx.navigation.NavController
-
+import com.example.habito.ui.theme.AppColors
 
 data class Habit(val title: String, val description: String, val isCompleted: Boolean = false)
 
 @Composable
-@Composable
-fun HomeScreen(navController: NavController) {
-    val habits = remember { mutableStateListOf(
-        Habit("Drink Water", "Stay hydrated and fresh"),
-        Habit("Read 10 pages", "Daily reading habit"),
-        Habit("Exercise", "15 min of body movement")
-    )}
-
-    // For edit dialog
+fun HomeScreen(
+    habits: List<Habit>,
+    navController: NavController,
+    onToggleComplete: (Habit) -> Unit,
+    onEditHabit: (Habit, String, String) -> Unit,
+    onDeleteHabit: (Habit) -> Unit,
+    onAddHabit: (Habit) -> Unit
+) {
+    var showAddDialog by remember { mutableStateOf(false) }
     var habitToEdit by remember { mutableStateOf<Habit?>(null) }
 
-    // For add habit dialog input
+    // Input for Add
     var newHabitTitle by remember { mutableStateOf("") }
     var newHabitDescription by remember { mutableStateOf("") }
-    var showAddDialog by remember { mutableStateOf(false) }
+
+    // Input for Edit
+    var editedTitle by remember { mutableStateOf("") }
+    var editedDescription by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -50,14 +52,13 @@ fun HomeScreen(navController: NavController) {
             items(habits) { habit ->
                 HabitCard(
                     habit = habit,
-                    onEdit = { habitToEdit = it },
-                    onDelete = { habits.remove(it) },
-                    onToggleComplete = { toggledHabit ->
-                        val index = habits.indexOf(toggledHabit)
-                        if (index != -1) {
-                            habits[index] = habits[index].copy(isCompleted = !habits[index].isCompleted)
-                        }
-                    }
+                    onEdit = {
+                        habitToEdit = it
+                        editedTitle = it.title
+                        editedDescription = it.description
+                    },
+                    onDelete = { onDeleteHabit(it) },
+                    onToggleComplete = { onToggleComplete(it) }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
             }
@@ -81,6 +82,7 @@ fun HomeScreen(navController: NavController) {
         }
     }
 
+    // -----------------------------
     // Add Habit Dialog
     if (showAddDialog) {
         AlertDialog(
@@ -91,28 +93,20 @@ fun HomeScreen(navController: NavController) {
                     OutlinedTextField(
                         value = newHabitTitle,
                         onValueChange = { newHabitTitle = it },
-                        label = { Text("Title") },
-                        singleLine = true
+                        label = { Text("Title") }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = newHabitDescription,
                         onValueChange = { newHabitDescription = it },
-                        label = { Text("Description") },
-                        maxLines = 3
+                        label = { Text("Description") }
                     )
                 }
             },
             confirmButton = {
                 TextButton(onClick = {
                     if (newHabitTitle.isNotBlank()) {
-                        habits.add(
-                            Habit(
-                                title = newHabitTitle.trim(),
-                                description = newHabitDescription.trim(),
-                                isCompleted = false
-                            )
-                        )
+                        onAddHabit(Habit(newHabitTitle.trim(), newHabitDescription.trim()))
                         showAddDialog = false
                     }
                 }) {
@@ -127,11 +121,9 @@ fun HomeScreen(navController: NavController) {
         )
     }
 
+    // -----------------------------
     // Edit Habit Dialog
     habitToEdit?.let { habit ->
-        var editedTitle by remember { mutableStateOf(habit.title) }
-        var editedDescription by remember { mutableStateOf(habit.description) }
-
         AlertDialog(
             onDismissRequest = { habitToEdit = null },
             title = { Text("Edit Habit") },
@@ -140,28 +132,20 @@ fun HomeScreen(navController: NavController) {
                     OutlinedTextField(
                         value = editedTitle,
                         onValueChange = { editedTitle = it },
-                        label = { Text("Title") },
-                        singleLine = true
+                        label = { Text("Title") }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = editedDescription,
                         onValueChange = { editedDescription = it },
-                        label = { Text("Description") },
-                        maxLines = 3
+                        label = { Text("Description") }
                     )
                 }
             },
             confirmButton = {
                 TextButton(onClick = {
                     if (editedTitle.isNotBlank()) {
-                        val index = habits.indexOf(habit)
-                        if (index != -1) {
-                            habits[index] = habit.copy(
-                                title = editedTitle.trim(),
-                                description = editedDescription.trim()
-                            )
-                        }
+                        onEditHabit(habit, editedTitle.trim(), editedDescription.trim())
                         habitToEdit = null
                     }
                 }) {
